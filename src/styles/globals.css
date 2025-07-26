@@ -1,4 +1,3 @@
-@tailwind base;
-@tailwind components;
+@import "tailwind/preflight";
 @tailwind utilities;
 
