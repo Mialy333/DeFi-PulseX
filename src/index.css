@@ -1,69 +1,87 @@
 @import "tailwindcss";
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Configuration personnalisée pour notre terminal DeFi */
+@theme {
+  --color-terminal-green: #10B981;
+  --color-terminal-blue: #3B82F6;
+  --color-terminal-amber: #F59E0B;
+  --color-terminal-red: #EF4444;
+  --color-slate-850: #1E293B;
+  --color-slate-925: #0F172A;
+  
+  --font-family-mono: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Styles de base pour notre terminal */
+@layer base {
+  body {
+    background-color: theme(colors.slate.900);
+    color: theme(colors.terminal.green);
+    font-family: theme(fontFamily.mono);
+    font-feature-settings: 'liga' 1, 'calt' 1;
   }
-  a:hover {
-    color: #747bff;
+  
+  /* Optimisation pour les animations en temps réel */
+  * {
+    box-sizing: border-box;
   }
-  button {
-    background-color: #f9f9f9;
+  
+  /* Amélioration de la lisibilité pour les données financières */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Composants personnalisés pour notre terminal */
+@layer components {
+  .terminal-panel {
+    background-color: color-mix(in srgb, theme(colors.slate.800) 50%, transparent);
+    border: 1px solid color-mix(in srgb, theme(colors.slate.700) 50%, transparent);
+    border-radius: theme(borderRadius.xl);
+    backdrop-filter: blur(theme(blur.sm));
+  }
+  
+  .terminal-button {
+    padding: theme(spacing.2) theme(spacing.4);
+    background-color: color-mix(in srgb, theme(colors.terminal.green) 20%, transparent);
+    border: 1px solid color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
+    border-radius: theme(borderRadius.lg);
+    color: theme(colors.terminal.green);
+    transition: all theme(transitionDuration.200) ease-in-out;
+  }
+  
+  .terminal-button:hover {
+    background-color: color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
+  }
+  
+  /* Styles spécialisés pour les données de trading */
+  .price-positive {
+    color: theme(colors.terminal.green);
+  }
+  
+  .price-negative {
+    color: theme(colors.terminal.red);
+  }
+  
+  .data-cell {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+}
+
+/* Utilitaires personnalisés pour les animations de marché */
+@layer utilities {
+  .animate-pulse-data {
+    animation: theme(animate.pulse.slow);
+  }
+  
+  .glow-green {
+    box-shadow: 0 0 20px color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
+  }
+  
+  .glow-blue {
+    box-shadow: 0 0 20px color-mix(in srgb, theme(colors.terminal.blue) 30%, transparent);
   }
 }
