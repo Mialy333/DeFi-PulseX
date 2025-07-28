@@ -17,9 +17,8 @@ import {
 import { useRealTimeData } from '../../hooks/useRealTimeData';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useGamification } from '../../hooks/useGamification';
-import { useFusionPlusSwap } from '../../hooks/useFusionPlusSwap';
+import { useFusionPlusSwap } from '../../hooks/useFusionPlus';
 
-import MarketOverview from './MarketOverview';
 import PortfolioSummary from './PortfolioSummary';
 import SwapInterface from './SwapInterface';
 import ArbitrageScanner from './ArbitrageScanner';

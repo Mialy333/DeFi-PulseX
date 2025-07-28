@@ -1,37 +1,23 @@
-// src/App.tsx
-import React, { useEffect, useState } from 'react';
+// App.tsx - Point d'entrée principal de l'application
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Import de notre composant Dashboard principal
-// Le chemin relatif './components/terminal/Dashboard' indique à TypeScript 
-// d'aller chercher le fichier Dashboard.tsx dans le dossier components/terminal
 import Dashboard from './components/terminal/Dashboard';
+import { useProxyConnection } from './services/api/1inch/client';
 
-// Import du hook de test de connexion proxy
-// Ce hook nous permettra de vérifier que notre infrastructure API fonctionne
-import { useProxyConnection } from './services/api/oneinch/proxyClient';
-
-// Adresse de démonstration pour le hackathon
-// Dans une vraie application, cette adresse viendrait de la connexion wallet
+// Simulation d'une connexion wallet pour la démo
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
 
 function App() {
-  // État local pour gérer l'adresse du wallet
-  // useState nous permet de changer dynamiquement l'adresse selon l'utilisateur connecté
-  const [walletAddress, setWalletAddress] = useState<string | undefined>(DEMO_WALLET_ADDRESS);
-  
-  // État pour gérer le chargement initial de l'application
-  // Cette approche améliore l'expérience utilisateur en évitant l'affichage prématuré d'éléments
+  const [walletAddress] = useState<string | undefined>(DEMO_WALLET_ADDRESS);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Hook personnalisé pour tester la connectivité de notre proxy 1inch
-  // Ce test est crucial car sans proxy fonctionnel, nos APIs ne marcheront pas
+  // Tester la connexion proxy au démarrage
   const { isConnected, isLoading: proxyLoading, error: proxyError } = useProxyConnection();
 
-  // Effet pour simuler un temps de chargement initial réaliste
-  // Dans une vraie application, ce serait le temps de chargement des données critiques
   useEffect(() => {
+    // Simuler un temps de chargement initial
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
@@ -39,8 +25,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Écran de chargement avec esthétique terminal
-  // Cette approche crée une transition fluide vers l'interface principale
+  // Écran de chargement avec style terminal
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -71,8 +56,7 @@ function App() {
     );
   }
 
-  // Gestion d'erreur de connexion proxy
-  // Cette approche offre une expérience utilisateur claire en cas de problème technique
+  // Écran d'erreur de connexion proxy
   if (proxyError && !isConnected) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
@@ -111,22 +95,12 @@ function App() {
     );
   }
 
-  // Interface principale de l'application
-  // C'est ici que nous utilisons notre composant Dashboard importé
   return (
     <div className="App">
-      {/* 
-        Utilisation du composant Dashboard importé
-        Nous passons walletAddress comme prop pour que Dashboard puisse 
-        personnaliser l'expérience selon l'utilisateur connecté
-      */}
+      {/* Dashboard principal */}
       <Dashboard walletAddress={walletAddress} />
       
-      {/* 
-        Système de notifications global
-        Toaster doit être placé à ce niveau pour être accessible 
-        à tous les composants enfants de l'application
-      */}
+      {/* Système de notifications */}
       <Toaster
         position="top-right"
         toastOptions={{
@@ -153,10 +127,7 @@ function App() {
         }}
       />
 
-      {/* 
-        Indicateur de connexion proxy en bas de l'écran
-        Cette information est cruciale pour le debugging pendant le développement
-      */}
+      {/* Indicateur de connexion proxy en bas de l'écran */}
       <div className="fixed bottom-4 right-4 z-50">
         <AnimatePresence>
           {!isConnected && !proxyLoading && (
