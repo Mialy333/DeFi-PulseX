@@ -16,9 +16,9 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 
-import { useTradingStore } from '../../store/tradingStore';
-import { ActiveTrade, XRPAtomicSwap } from '../../types/api';
-import { formatCurrency, formatTimeAgo } from '../../utils/formatters';
+import { useTradingStore } from '../../../store/tradingStore';
+import { ActiveTrade, XRPAtomicSwap } from '../../../types/api';
+import { formatCurrency, formatTimeAgo } from '../../../utils/formatters';
 
 interface ActiveTradesProps {
   expanded?: boolean;
@@ -32,7 +32,7 @@ const ActiveTrades: React.FC<ActiveTradesProps> = ({
   const [filter, setFilter] = useState<'all' | 'pending' | 'processing' | 'completed'>('all');
   const [selectedTrade, setSelectedTrade] = useState<string | null>(null);
 
-  const { activeTrades, tradeHistory, crossChainSwaps } = useTradingStore();
+  const { activeTrades, tradeHistory } = useTradingStore();
 
   // Combiner tous les trades (actifs + historique récent pour la démo)
   const allTrades = [

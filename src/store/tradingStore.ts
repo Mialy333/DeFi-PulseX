@@ -1,3 +1,11 @@
+import { create } from 'zustand';
+import { ActiveTrade, XRPAtomicSwap } from '../types/api';
+
+interface TradingStoreState {
+  activeTrades: ActiveTrade[];
+  tradeHistory: ActiveTrade[];
+  crossChainSwaps: XRPAtomicSwap[];
+}
 interface TradingState {
   // Trades en cours - Critical pour le suivi temps réel
   activeTrades: ActiveTrade[];
