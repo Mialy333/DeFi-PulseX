@@ -2,12 +2,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  TrendingUp, 
-  TrendingDown, 
+   
   BarChart3, 
   Activity,
   Globe,
-  Zap,
   Filter,
   ArrowUpRight,
   ArrowDownRight,

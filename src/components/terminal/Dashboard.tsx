@@ -1,5 +1,5 @@
 // components/terminal/Dashboard.tsx - Vue principale du terminal DeFi
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
@@ -19,11 +19,12 @@ import { usePortfolio } from '../../hooks/usePortfolio';
 import { useGamification } from '../../hooks/useGamification';
 import { useFusionPlusSwap } from '../../hooks/useFusionPlus';
 
-import PortfolioSummary from './PortfolioSummary';
+import PortfolioSummary from './Portfolio';
 import SwapInterface from './SwapInterface';
-import ArbitrageScanner from './ArbitrageScanner';
-import ActiveTrades from './ActiveTrades';
+import ArbitrageScanner from './Analytics/ArbitrageScanner';
+import ActiveTrades from './Analytics/ActiveTrades';
 import GamificationPanel from '../gamification/GamificationPanel';
+import MarketOverview from './MarketData';
 
 // Types pour les onglets du terminal
 type TerminalTab = 'overview' | 'portfolio' | 'trading' | 'analytics' | 'community';
@@ -53,7 +54,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const { metrics: portfolioMetrics, isLoading: portfolioLoading } = usePortfolio(walletAddress);
   const { profile, engagementMetrics } = useGamification(walletAddress);
-  const { swapStats, isInitializing: swapInitializing } = useFusionPlusSwap();
+  const { swapStats } = useFusionPlusSwap();
 
   // Animation variants pour les panels
   const panelVariants = {
