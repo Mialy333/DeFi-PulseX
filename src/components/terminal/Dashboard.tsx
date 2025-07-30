@@ -88,7 +88,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="flex items-center space-x-2">
               <Activity className="w-6 h-6 text-green-400" />
               <h1 className="text-xl font-bold text-green-400">
-                DeFi Terminal Pro
+                DeFi PulseX Pro
               </h1>
             </div>
             

@@ -45,7 +45,7 @@ function App() {
             className="w-16 h-16 border-4 border-green-400/30 border-t-green-400 rounded-full mx-auto mb-6"
           />
           <h1 className="text-2xl font-bold text-green-400 mb-2 font-mono">
-            DeFi Terminal Pro
+            DeFi PulseX Pro 
           </h1>
           <p className="text-slate-400 font-mono">
             Initializing cross-chain protocols...
