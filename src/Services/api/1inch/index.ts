@@ -1,3 +1,8 @@
+// src/services/api/1inch/index.ts
+import { SwapAPI } from './swapApi';
+import { PortfolioAPI } from './portfolioApi';
+import { MarketAPI } from './marketApi';
+
 export class OneInchAPI {
   public swap: SwapAPI;
   public portfolio: PortfolioAPI;
@@ -14,7 +19,7 @@ export class OneInchAPI {
     try {
       // Test simple sur chaque API
       await Promise.all([
-        this.market.getSpotPrice('0xA0b86a33E6885D3C5906C0Ae01fAec12E7e9B85E'), // USDC
+        this.market.getSpotPrice('0xA0b86a33E6885D0c5906C0Ae01fAec12E7e9B85E'), // USDC
         this.market.getGasPrice(),
       ]);
       
@@ -29,3 +34,8 @@ export class OneInchAPI {
 
 // Configuration par défaut pour l'export
 export const createOneInchAPI = (apiKey: string) => new OneInchAPI(apiKey);
+
+// Export all API classes
+export { SwapAPI } from './swapApi';
+export { PortfolioAPI } from './portfolioApi';
+export { MarketAPI } from './marketApi';

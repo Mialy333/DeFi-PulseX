@@ -1,26 +1,5 @@
+// src/services/api/1inch/client.ts
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-// ...existing code (if any)
-
-// Ajoutez ce hook si non présent
-import { useState, useEffect } from 'react';
-
-export function useProxyConnection() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    // Simulez une connexion API (remplacez par votre logique réelle)
-    const timer = setTimeout(() => {
-      setIsConnected(true);
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return { isConnected, isLoading, error };
-}
 
 class OneInchClient {
   private client: AxiosInstance;
@@ -29,22 +8,20 @@ class OneInchClient {
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
-    // Utiliser le proxy Vercel pour contourner CORS (comme mentionné dans la doc)
-    this.baseURL = '/api/1inch-proxy'; // Pointe vers notre proxy Vercel
+    // Utiliser le proxy Vercel pour contourner CORS
+    this.baseURL = '/api/1inch-proxy';
     
     this.client = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000, // 10 secondes timeout - Important pour les APIs temps réel
+      timeout: 10000,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        // L'autorisation sera ajoutée par le proxy
       }
     });
 
     // Intercepteur pour ajouter l'API key et gérer les erreurs
     this.client.interceptors.request.use((config) => {
-      // Le proxy Vercel ajoutera l'API key
       config.headers['X-API-Key'] = this.apiKey;
       return config;
     });
@@ -75,3 +52,5 @@ export const getOneInchClient = (apiKey: string): OneInchClient => {
   }
   return clientInstance;
 };
+
+export default OneInchClient;

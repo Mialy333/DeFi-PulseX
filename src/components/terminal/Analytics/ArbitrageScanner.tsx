@@ -1,4 +1,4 @@
-// components/terminal/ArbitrageScanner.tsx - Détection d'opportunités cross-chain
+// components/terminal/Analytics/ArbitrageScanner.tsx - Détection d'opportunités cross-chain
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -15,9 +15,9 @@ import {
   Target
 } from 'lucide-react';
 
-import { useMarketStore } from '../../store/marketStore';
-import { ArbitrageOpportunity } from '../../types/api';
-import { formatCurrency, formatPercentage } from '../../utils/formatters';
+import { useMarketStore } from '../../../store/marketStore';
+import { ArbitrageOpportunity } from '../../../types/api';
+import { formatCurrency, formatPercentage } from '../../../utils/formatters';
 
 interface ArbitrageScannerProps {
   expanded?: boolean;

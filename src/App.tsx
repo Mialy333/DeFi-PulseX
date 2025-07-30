@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Dashboard from './components/terminal/Dashboard';
-import { useProxyConnection } from './services/api/1inch/client';
+import { useProxyConnection } from './hooks/useProxyConnection';
 
 // Simulation d'une connexion wallet pour la démo
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';

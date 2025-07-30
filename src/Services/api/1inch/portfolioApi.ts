@@ -1,4 +1,6 @@
+// src/services/api/1inch/portfolioApi.ts
 import { Portfolio, TokenBalance } from '../../../types/api';
+import OneInchClient, { getOneInchClient } from './client';
 
 export class PortfolioAPI {
   private client: OneInchClient;

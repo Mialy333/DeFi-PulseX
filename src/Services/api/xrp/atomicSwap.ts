@@ -1,4 +1,8 @@
+// src/services/api/xrp/atomicSwap.ts
 import { ethers } from 'ethers';
+import CryptoJS from 'crypto-js';
+import { XRPLClient } from './xrplClient';
+import { XRPAtomicSwap } from '../../../types/api';
 
 export class AtomicSwapManager {
   private xrplClient: XRPLClient;
@@ -189,51 +193,6 @@ export class AtomicSwapManager {
     if (!this.ethereumWallet) {
       throw new Error('Wallet Ethereum non connecté');
     }
-
-    // Smart contract d'escrow simple (pour la démo)
-    const escrowContract = `
-      pragma solidity ^0.8.0;
-      
-      contract AtomicSwapEscrow {
-          mapping(bytes32 => EscrowData) public escrows;
-          
-          struct EscrowData {
-              address payable recipient;
-              uint256 amount;
-              uint256 timelock;
-              bool completed;
-              bool refunded;
-          }
-          
-          function createEscrow(
-              bytes32 secretHash,
-              address payable recipient,
-              uint256 timelock
-          ) external payable {
-              require(msg.value > 0, "Amount must be greater than 0");
-              
-              escrows[secretHash] = EscrowData({
-                  recipient: recipient,
-                  amount: msg.value,
-                  timelock: timelock,
-                  completed: false,
-                  refunded: false
-              });
-          }
-          
-          function completeSwap(bytes32 secret) external {
-              bytes32 secretHash = keccak256(abi.encodePacked(secret));
-              EscrowData storage escrow = escrows[secretHash];
-              
-              require(escrow.amount > 0, "Escrow does not exist");
-              require(!escrow.completed, "Already completed");
-              require(!escrow.refunded, "Already refunded");
-              
-              escrow.completed = true;
-              escrow.recipient.transfer(escrow.amount);
-          }
-      }
-    `;
 
     // Pour la démo, on simule la création du contrat
     const tx = await this.ethereumWallet.sendTransaction({
