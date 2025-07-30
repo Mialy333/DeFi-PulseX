@@ -1,29 +1,33 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useMarketStore } from '../store/marketStore';
-import { createOneInchAPI } from '../services/api/oneinch';
+import { getOneInchService } from '../services/api/1inch/service';
 import type { MarketData, ChartData } from '../types/api';
+import { REFRESH_INTERVALS } from '../utils/constants';
 
 interface UseRealTimeDataProps {
-  tokens: string[]; // Adresses des tokens à surveiller
-  updateInterval: number; // Intervalle en millisecondes
-  enableArbitrage?: boolean; // Activer la détection d'arbitrage
+  tokens: string[];
+  updateInterval?: number;
+  enableArbitrage?: boolean;
+  onError?: (error: string) => void;
 }
 
 export const useRealTimeData = ({
   tokens,
-  updateInterval = 30000, // 30 secondes par défaut
-  enableArbitrage = true
+  updateInterval = REFRESH_INTERVALS.MARKET_DATA,
+  enableArbitrage = true,
+  onError
 }: UseRealTimeDataProps) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const apiRef = useRef<ReturnType<typeof createOneInchAPI> | null>(null);
+  const oneInchServiceRef = useRef<ReturnType<typeof getOneInchService> | null>(null);
   
-  // Récupérer les fonctions du store
   const {
     marketData,
     updateMarketData,
+    batchUpdateMarketData,
     setArbitrageOpportunities,
     setConnectionStatus,
     setError,
+    updateGlobalStats,
     isConnected,
     lastUpdate
   } = useMarketStore();
