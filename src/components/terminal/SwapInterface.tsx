@@ -15,7 +15,6 @@ import {
 import { useFusionPlusSwap } from '../../hooks/useFusionPlusSwap';
 import { useGamification } from '../../hooks/useGamification';
 import { useMarketStore } from '../../store/marketStore';
-import { formatCurrency, formatTimeRemaining } from '../../utils/formatters';
 
 interface SwapInterfaceProps {
   walletAddress?: string;
@@ -65,7 +64,7 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
     XRP: 0.50  // $0.50 par XRP
   }), []);
 
-  // Calculer le montant de sortie estimé
+ 
   const calculateOutput = useCallback(async (input: string) => {
     if (!input || parseFloat(input) <= 0) {
       setToAmount('');
@@ -76,7 +75,7 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
     setIsCalculating(true);
     
     try {
-      // Simulation du calcul (dans une vraie app, on appellerait l'API 1inch)
+    
       const inputAmount = parseFloat(input);
       let outputAmount: number;
       let exchangeRate: number;
@@ -93,7 +92,7 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
         exchangeRate = outputAmount / inputAmount;
       }
 
-      // Simuler des frais et slippage
+     
       const networkFee = direction === 'ETH_to_XRP' ? 0.003 : 50; // 0.003 ETH ou 50 XRP
       const slippage = 0.005; // 0.5%
       const finalOutput = outputAmount * (1 - slippage);
@@ -118,7 +117,7 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
     }
   }, [direction, prices]);
 
-  // Effet pour recalculer quand le montant change
+ 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       calculateOutput(fromAmount);
