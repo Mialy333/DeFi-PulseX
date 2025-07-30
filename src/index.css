@@ -1,7 +1,10 @@
-@import "tailwindcss";
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Configuration personnalisée pour notre terminal DeFi */
-@theme {
+:root {
   --color-terminal-green: #10B981;
   --color-terminal-blue: #3B82F6;
   --color-terminal-amber: #F59E0B;
@@ -14,74 +17,65 @@
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Styles de base pour notre terminal */
-@layer base {
-  body {
-    background-color: theme(colors.slate.900);
-    color: theme(colors.terminal.green);
-    font-family: theme(fontFamily.mono);
-    font-feature-settings: 'liga' 1, 'calt' 1;
-  }
-  
-  /* Optimisation pour les animations en temps réel */
-  * {
-    box-sizing: border-box;
-  }
-  
-  /* Amélioration de la lisibilité pour les données financières */
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
-  }
+body {
+  @apply bg-slate-900 text-green-400 font-mono;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Composants personnalisés pour notre terminal */
-@layer components {
-  .terminal-panel {
-    background-color: color-mix(in srgb, theme(colors.slate.800) 50%, transparent);
-    border: 1px solid color-mix(in srgb, theme(colors.slate.700) 50%, transparent);
-    border-radius: theme(borderRadius.xl);
-    backdrop-filter: blur(theme(blur.sm));
-  }
-  
-  .terminal-button {
-    padding: theme(spacing.2) theme(spacing.4);
-    background-color: color-mix(in srgb, theme(colors.terminal.green) 20%, transparent);
-    border: 1px solid color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
-    border-radius: theme(borderRadius.lg);
-    color: theme(colors.terminal.green);
-    transition: all theme(transitionDuration.200) ease-in-out;
-  }
-  
-  .terminal-button:hover {
-    background-color: color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
-  }
-  
-  /* Styles spécialisés pour les données de trading */
-  .price-positive {
-    color: theme(colors.terminal.green);
-  }
-  
-  .price-negative {
-    color: theme(colors.terminal.red);
-  }
-  
-  .data-cell {
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-  }
+.terminal-panel {
+  @apply bg-slate-800/50 border border-slate-700/50 rounded-xl backdrop-blur-sm;
+}
+
+.terminal-button {
+  @apply px-4 py-2 bg-green-400/20 border border-green-400/30 rounded-lg text-green-400 transition duration-200 ease-in-out;
+}
+
+.terminal-button:hover {
+  @apply bg-green-400/30;
+}
+
+/* Styles spécialisés pour les données de trading */
+.price-positive {
+  @apply text-green-400;
+}
+
+.price-negative {
+  @apply text-red-400;
+}
+
+.data-cell {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 /* Utilitaires personnalisés pour les animations de marché */
-@layer utilities {
-  .animate-pulse-data {
-    animation: theme(animate.pulse.slow);
+.animate-pulse-data {
+  animation: var(--animate-pulse-slow);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px #10B98133;
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px #3B82F633;
+}
+
+/* Animation custom pulse */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
   }
-  
-  .glow-green {
-    box-shadow: 0 0 20px color-mix(in srgb, theme(colors.terminal.green) 30%, transparent);
-  }
-  
-  .glow-blue {
-    box-shadow: 0 0 20px color-mix(in srgb, theme(colors.terminal.blue) 30%, transparent);
+  50% {
+    opacity: .5;
   }
 }
