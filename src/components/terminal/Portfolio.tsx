@@ -1,12 +1,7 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   DollarSign, 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart, 
-  BarChart3,
   Wallet,
   RefreshCw,
   Eye,
@@ -15,8 +10,7 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 
-import { usePortfolio } from '../../hooks/usePortfolio';
-import type { TokenBalance } from '../../types/api';
+import { useMetaMaskPortfolio } from '../../hooks/useMetaMaskPortfolio';
 
 interface PortfolioSummaryProps {
   walletAddress?: string;
@@ -28,77 +22,30 @@ interface PortfolioSummaryProps {
 const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({ 
   walletAddress,
   detailed = false,
-  isLoading = false,
   className = '' 
 }) => {
   const [showBalances, setShowBalances] = useState(true);
-  const [selectedChain, setSelectedChain] = useState<string>('all');
-
-  const {
-    portfolio,
-    topTokensByValue,
-    metrics,
-    refreshPortfolio
-  } = usePortfolio(walletAddress);
-
-  // Données simulées pour la démo
-  const mockPortfolioData = {
-    totalValueUSD: 125430.50,
-    totalPnL24h: 2340.25,
-    pnlPercentage: 1.87,
+  const portfolioData = useMetaMaskPortfolio();
+  
+  // Transform MetaMask portfolio data into the expected format
+  const displayData = {
+    totalValueUSD: parseFloat(portfolioData.totalValueUSD),
+    totalPnL24h: portfolioData.tokens.reduce((sum, token) => sum + (parseFloat(token.balanceUSD) * (token.change24h / 100)), 0),
+    pnlPercentage: portfolioData.tokens.reduce((sum, token) => sum + token.change24h, 0) / portfolioData.tokens.length,
     chains: [
       {
         chainId: 1,
         name: 'Ethereum',
-        totalValueUSD: '98550.25',
-        tokens: [
-          {
-            address: '0xA0b86a33E6885D0c5906C0Ae01fAec12E7e9B85E',
-            symbol: 'USDC',
-            name: 'USD Coin',
-            decimals: 6,
-            balance: '45230.50',
-            balanceUSD: '45230.50',
-            price: '1.00',
-            change24h: 0.02,
-            logoURI: '/tokens/usdc.png'
-          },
-          {
-            address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-            symbol: 'WETH',
-            name: 'Wrapped Ether',
-            decimals: 18,
-            balance: '26.75',
-            balanceUSD: '53500.00',
-            price: '2000.00',
-            change24h: 2.1,
-            logoURI: '/tokens/weth.png'
-          }
-        ]
-      },
-      {
-        chainId: 'xrp',
-        name: 'XRP Ledger',
-        totalValueUSD: '26880.25',
-        tokens: [
-          {
-            address: 'rXRPXRPXRPXRPXRPXRPXRPXRPXRPXRPXRP',
-            symbol: 'XRP',
-            name: 'XRP',
-            decimals: 6,
-            balance: '53760.50',
-            balanceUSD: '26880.25',
-            price: '0.50',
-            change24h: 5.7,
-            logoURI: '/tokens/xrp.png'
-          }
-        ]
+        totalValueUSD: portfolioData.totalValueUSD,
+        tokens: portfolioData.tokens.map(token => ({
+          ...token,
+          logoURI: `/tokens/${token.symbol.toLowerCase()}.png`
+        }))
       }
     ]
   };
 
-  const displayData = portfolio || mockPortfolioData;
-  const isProfit = (portfolio?.totalPnL24h || mockPortfolioData.totalPnL24h) >= 0;
+  const isProfit = displayData.totalPnL24h >= 0;
 
   if (!walletAddress) {
     return (
@@ -109,7 +56,7 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
             Connect Your Wallet
           </h3>
           <p className="text-sm text-slate-500">
-            View your cross-chain portfolio and track performance
+            View your MetaMask portfolio and track performance
           </p>
           <button className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors">
             Connect Wallet
@@ -133,7 +80,7 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
                 Portfolio Overview
               </h3>
               <p className="text-sm text-slate-400">
-                Cross-chain asset tracking
+                MetaMask assets tracking
               </p>
             </div>
           </div>
@@ -151,21 +98,21 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
             </button>
             
             <motion.button
-              onClick={refreshPortfolio}
+              onClick={() => window.location.reload()}
               className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
               whileTap={{ rotate: 180 }}
-              disabled={isLoading}
+              disabled={portfolioData.isLoading}
             >
-              <RefreshCw className={`w-4 h-4 text-slate-400 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-slate-400 ${portfolioData.isLoading ? 'animate-spin' : ''}`} />
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Métriques principales */}
+      {/* Main metrics */}
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Valeur totale */}
+          {/* Total value */}
           <motion.div 
             className="text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -174,13 +121,13 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
             <div className="text-sm text-slate-400 mb-1">Total Portfolio Value</div>
             <div className="text-3xl font-bold text-white mb-2">
               {showBalances ? (
-                `$${(portfolio?.totalValueUSD || mockPortfolioData.totalValueUSD).toLocaleString()}`
+                `$${displayData.totalValueUSD.toLocaleString()}`
               ) : (
                 '••••••••'
               )}
             </div>
             <div className="text-xs text-slate-500">
-              Across {displayData.chains?.length || 0} chains
+              {portfolioData.tokens.length} tokens on Ethereum
             </div>
           </motion.div>
 
@@ -202,22 +149,22 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
               )}
               <span>
                 {showBalances ? (
-                  `${isProfit ? '+' : ''}$${Math.abs(portfolio?.totalPnL24h || mockPortfolioData.totalPnL24h).toFixed(2)}`
+                  `${isProfit ? '+' : ''}$${Math.abs(displayData.totalPnL24h).toFixed(2)}`
                 ) : (
-                  '•••••'
+                  '••••••'
                 )}
               </span>
             </div>
-            <div className={`text-xs ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
               {showBalances ? (
-                `${isProfit ? '+' : ''}${(portfolio?.pnlPercentage || mockPortfolioData.pnlPercentage).toFixed(2)}%`
+                `${isProfit ? '+' : ''}${displayData.pnlPercentage.toFixed(2)}%`
               ) : (
                 '••••'
               )}
             </div>
           </motion.div>
 
-          {/* Nombre d'assets */}
+          {/* Assets */}
           <motion.div 
             className="text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -226,166 +173,77 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
           >
             <div className="text-sm text-slate-400 mb-1">Assets</div>
             <div className="text-2xl font-bold text-white mb-2">
-              {displayData.chains?.reduce((sum, chain) => sum + (chain.tokens?.length || 0), 0) || 0}
+              {portfolioData.tokens.length}
             </div>
             <div className="text-xs text-slate-500">
-              Unique tokens
+              Tokens tracked
             </div>
           </motion.div>
         </div>
 
-        {/* Sélecteur de chaîne (si detailed) */}
+        {/* Asset list */}
         {detailed && (
-          <div className="flex items-center space-x-2 mb-6">
-            <span className="text-sm text-slate-400">Filter by chain:</span>
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setSelectedChain('all')}
-                className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                  selectedChain === 'all'
-                    ? 'bg-blue-600/30 text-blue-400 border border-blue-600/50'
-                    : 'bg-slate-700/30 text-slate-400 hover:text-white'
-                }`}
-              >
-                All Chains
-              </button>
-              {displayData.chains?.map(chain => (
-                <button
-                  key={chain.chainId}
-                  onClick={() => setSelectedChain(chain.chainId.toString())}
-                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                    selectedChain === chain.chainId.toString()
-                      ? 'bg-blue-600/30 text-blue-400 border border-blue-600/50'
-                      : 'bg-slate-700/30 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {chain.name}
-                </button>
-              ))}
+          <div className="mt-6">
+            <div className="border-b border-slate-700/50 pb-2 mb-4">
+              <h4 className="text-sm font-semibold text-slate-400">Token Holdings</h4>
             </div>
-          </div>
-        )}
-
-        {/* Liste des tokens */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-slate-300">
-              {detailed ? 'All Assets' : 'Top Assets'}
-            </h4>
-            {!detailed && (
-              <button className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
-                View All →
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            {displayData.chains
-              ?.filter(chain => selectedChain === 'all' || chain.chainId.toString() === selectedChain)
-              .flatMap(chain => 
-                chain.tokens?.map(token => ({ ...token, chainName: chain.name })) || []
-              )
-              .slice(0, detailed ? undefined : 5)
-              .map((token, index) => (
-                <motion.div
-                  key={`${token.address}-${index}`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex items-center justify-between p-3 bg-slate-900/50 hover:bg-slate-900/70 rounded-lg border border-slate-700/30 transition-all group"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">
-                        {token.symbol.slice(0, 3)}
-                      </span>
-                    </div>
-                    
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-semibold text-white">{token.symbol}</span>
-                        <span className="text-xs text-slate-400">on {token.chainName}</span>
+            <div className="space-y-3">
+              {displayData.chains[0].tokens
+                .sort((a, b) => parseFloat(b.balanceUSD) - parseFloat(a.balanceUSD))
+                .map((token, index) => (
+                  <motion.div
+                    key={token.address}
+                    className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 hover:bg-slate-800/50"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      {/* Token icon */}
+                      <div className="w-8 h-8 bg-slate-700 rounded-full overflow-hidden">
+                        <img 
+                          src={token.logoURI} 
+                          alt={token.symbol}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/tokens/placeholder.png';
+                          }}
+                        />
                       </div>
-                      <div className="text-sm text-slate-400">
+                      
+                      {/* Token info */}
+                      <div>
+                        <div className="font-medium text-white">{token.symbol}</div>
+                        <div className="text-sm text-slate-400">
+                          {showBalances ? (
+                            parseFloat(token.balance).toFixed(4)
+                          ) : (
+                            '•••••'
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Value and change */}
+                    <div className="text-right">
+                      <div className="font-medium text-white">
                         {showBalances ? (
-                          `${parseFloat(token.balance).toLocaleString()} ${token.symbol}`
+                          `$${parseFloat(token.balanceUSD).toLocaleString()}`
                         ) : (
-                          '••••••••'
+                          '•••••'
                         )}
                       </div>
+                      <div className={`text-sm ${
+                        token.change24h >= 0 ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="font-semibold text-white">
-                      {showBalances ? `$${parseFloat(token.balanceUSD).toLocaleString()}` : '•••••'}
-                    </div>
-                    <div className={`text-sm flex items-center space-x-1 ${
-                      token.change24h >= 0 ? 'text-green-400' : 'text-red-400'
-                    }`}>
-                      {token.change24h >= 0 ? (
-                        <TrendingUp className="w-3 h-3" />
-                      ) : (
-                        <TrendingDown className="w-3 h-3" />
-                      )}
-                      <span>{Math.abs(token.change24h).toFixed(2)}%</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-          </div>
-        </div>
-
-        {/* Répartition par chaîne (si detailed) */}
-        {detailed && (
-          <div className="mt-6 pt-6 border-t border-slate-700/50">
-            <h4 className="text-sm font-semibold text-slate-300 mb-4">
-              Chain Distribution
-            </h4>
-            
-            <div className="space-y-3">
-              {displayData.chains?.map((chain, index) => {
-                const percentage = ((parseFloat(chain.totalValueUSD) / (portfolio?.totalValueUSD || mockPortfolioData.totalValueUSD)) * 100);
-                
-                return (
-                  <div key={chain.chainId} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-white">{chain.name}</span>
-                      <span className="text-slate-400">
-                        {showBalances ? `$${parseFloat(chain.totalValueUSD).toLocaleString()}` : '•••••'} 
-                        ({percentage.toFixed(1)}%)
-                      </span>
-                    </div>
-                    
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <motion.div
-                        className={`h-full rounded-full ${
-                          index === 0 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
-                          index === 1 ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
-                          'bg-gradient-to-r from-green-500 to-emerald-500'
-                        }`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 1, delay: index * 0.2 }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  </motion.div>
+                ))}
             </div>
           </div>
         )}
-      </div>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-slate-700/50 bg-slate-900/30">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>💼 Multi-chain portfolio tracking</span>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span>Live prices</span>
-          </div>
-        </div>
       </div>
     </div>
   );
