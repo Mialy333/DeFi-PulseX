@@ -1,5 +1,5 @@
 // src/services/api/1inch/portfolioApi.ts
-import { Portfolio, TokenBalance } from '../../../types/api';
+import type { Portfolio, TokenBalance } from '../../../types/api';
 import OneInchClient, { getOneInchClient } from './client';
 
 export class PortfolioAPI {

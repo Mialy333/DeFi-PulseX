@@ -1,6 +1,6 @@
 // src/store/portfolioStore.ts
 import { create } from 'zustand';
-import { Portfolio, TokenBalance } from '../types/api';
+import type { Portfolio, TokenBalance } from '../types/api';
 
 interface PortfolioState {
   // Données du portefeuille - Central pour l'expérience utilisateur

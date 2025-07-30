@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 import { useTradingStore } from '../../../store/tradingStore';
-import { ActiveTrade, XRPAtomicSwap } from '../../../types/api';
+import type { ActiveTrade, XRPAtomicSwap } from '../../../types/api';
 import { formatCurrency, formatTimeAgo } from '../../../utils/formatters';
 
 interface ActiveTradesProps {

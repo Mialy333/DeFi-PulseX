@@ -1,3 +1,21 @@
+// Type exports
+export type {
+  MarketData,
+  SimpleChartData,
+  QuoteResponse,
+  TokenList,
+  Portfolio,
+  TokenBalance,
+  UserProfile,
+  NFTReward,
+  ActiveTrade,
+  XRPAtomicSwap,
+  ArbitrageOpportunity,
+  ChartResponse,
+  ChartData
+};
+
+// Type definitions
 export interface MarketData {
   price: number;
   volume24h: number;
@@ -140,6 +158,16 @@ export interface XRPAtomicSwap {
 
 // GAMIFICATION 
 
+// Re-export all types to ensure they're available
+export type {
+  Portfolio,
+  TokenBalance,
+  UserProfile,
+  NFTReward,
+  ActiveTrade,
+  XRPAtomicSwap,
+  ArbitrageOpportunity
+};
 
 export interface UserProfile {
   walletAddress: string;

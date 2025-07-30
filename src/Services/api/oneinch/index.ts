@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MarketData, QuoteResponse, TokenList } from '../../../types/api';
+import type { MarketData, QuoteResponse, TokenList } from '../../../types/api';
 
 const BASE_URL = 'https://api.1inch.dev/v5.0';
 

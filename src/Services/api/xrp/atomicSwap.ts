@@ -2,7 +2,7 @@
 import { ethers } from 'ethers';
 import CryptoJS from 'crypto-js';
 import { XRPLClient } from './xrplClient';
-import { XRPAtomicSwap } from '../../../types/api';
+import type { XRPAtomicSwap } from '../../../types/api';
 
 export class AtomicSwapManager {
   private xrplClient: XRPLClient;

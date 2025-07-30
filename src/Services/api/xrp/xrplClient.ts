@@ -1,7 +1,7 @@
 // src/services/api/xrp/xrplClient.ts
 import { Client, Wallet, xrpToDrops, dropsToXrp } from 'xrpl';
 import CryptoJS from 'crypto-js';
-import { XRPAtomicSwap } from '../../../types/api';
+import type { XRPAtomicSwap } from '../../../types/api';
 
 export class XRPLClient {
   private client: Client;

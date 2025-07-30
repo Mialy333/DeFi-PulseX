@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 import { usePortfolio } from '../../hooks/usePortfolio';
-import { TokenBalance } from '../../types/api';
+import type { TokenBalance } from '../../types/api';
 
 interface PortfolioSummaryProps {
   walletAddress?: string;

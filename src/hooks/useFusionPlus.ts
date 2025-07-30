@@ -3,7 +3,7 @@ import { useTradingStore } from '../store/tradingStore';
 import { XRPLClient } from '../services/api/xrp/xrplClient';
 import { AtomicSwapManager } from '../services/api/xrp/atomicSwap';
 import { FusionPlusXRPIntegration } from '../services/api/xrp/fusionPlusXRP';
-import { XRPAtomicSwap, ActiveTrade } from '../types/api';
+import type { XRPAtomicSwap, ActiveTrade } from '../types/api';
 
 export const useFusionPlusSwap = () => {
   const [isInitializing, setIsInitializing] = useState(false);

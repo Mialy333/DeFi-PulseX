@@ -1,6 +1,6 @@
 // src/store/userStore.ts
 import { create } from 'zustand';
-import { UserProfile, NFTReward } from '../types/api';
+import type { UserProfile, NFTReward } from '../types/api';
 
 interface UserState {
   // Profil utilisateur complet

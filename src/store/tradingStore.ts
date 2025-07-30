@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ActiveTrade, XRPAtomicSwap } from '../types/api';
+import type { ActiveTrade, XRPAtomicSwap } from '../types/api';
 
 interface TradingStoreState {
   activeTrades: ActiveTrade[];

@@ -1,5 +1,6 @@
 // src/services/api/proxy.ts
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 /**
  * Client proxy unifié pour toutes les communications API externes

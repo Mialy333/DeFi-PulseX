@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 import { useMarketStore } from '../../../store/marketStore';
-import { ArbitrageOpportunity } from '../../../types/api';
+import type { ArbitrageOpportunity } from '../../../types/api';
 import { formatCurrency, formatPercentage } from '../../../utils/formatters';
 
 interface ArbitrageScannerProps {

@@ -1,9 +1,10 @@
 // src/services/api/xrp/fusionPlusXRP.ts
 import { XRPLClient } from './xrplClient';
 import { AtomicSwapManager } from './atomicSwap';
-import { HashlockManager, HashlockData, TimelockParams } from './hashlock';
+import { HashlockManager } from './hashlock';
+import type { HashlockData, TimelockParams } from './hashlock';
 import { getProxyClient } from '../proxy';
-import { XRPAtomicSwap, ActiveTrade } from '../../../types/api';
+import type { XRPAtomicSwap } from '../../../types/api';
 
 
 
