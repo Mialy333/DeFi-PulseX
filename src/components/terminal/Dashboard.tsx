@@ -1,30 +1,23 @@
-// components/terminal/Dashboard.tsx - Vue principale du terminal DeFi
-import React, { useState } from 'react';
+// components/terminal/Dashboard.tsx - Main DeFi terminal view
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
-  TrendingDown, 
   Activity, 
   DollarSign, 
   Zap, 
   Globe, 
-  AlertTriangle,
   RefreshCw,
   Settings,
   Bell
 } from 'lucide-react';
 
-import { useRealTimeData } from '../../hooks/useRealTimeData';
+import { use1InchMarketData } from '../../hooks/use1InchMarketData';
 import { usePortfolio } from '../../hooks/usePortfolio';
 import { useGamification } from '../../hooks/useGamification';
-import { useFusionPlusSwap } from '../../hooks/useFusionPlus';
-
-import PortfolioSummary from './Portfolio';
-import SwapInterface from './SwapInterface';
-import ArbitrageScanner from './Analytics/ArbitrageScanner';
-import ActiveTrades from './Analytics/ActiveTrades';
-import GamificationPanel from '../gamification/GamificationPanel';
-import MarketOverview from './MarketData';
+import { useFusionPlusSwap } from '../../hooks/useFusionPlusSwap';
+import { useMarketStore } from '../../store/marketStore';
+import TabContent from './TabContent';
 
 // Types pour les onglets du terminal
 type TerminalTab = 'overview' | 'portfolio' | 'trading' | 'analytics' | 'community';
@@ -43,7 +36,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Hooks pour les données
-  const { marketData, isConnected, lastUpdate } = useRealTimeData({
+  const { marketData, isConnected, lastUpdate } = useMarketStore();
+  console.log('Dashboard marketData:', marketData, 'isConnected:', isConnected);
+  const { refresh } = use1InchMarketData({
     tokens: [
       '0xA0b86a33E6886D0c5906C0Ae01fAec12E7e9B85E', // USDC
       '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', // WETH
@@ -56,27 +51,39 @@ const Dashboard: React.FC<DashboardProps> = ({
   const { profile, engagementMetrics } = useGamification(walletAddress);
   const { swapStats } = useFusionPlusSwap();
 
-  // Animation variants pour les panels
-  const panelVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
-  };
-
-  // Forcer un refresh des données
+  // Force data refresh
   const handleRefresh = () => {
+    refresh();
     setRefreshKey(prev => prev + 1);
   };
 
-  // Calculer les statistiques globales
-  const globalStats = {
-    totalValue: portfolioMetrics.totalValueUSD,
-    pnl24h: portfolioMetrics.totalPnL24h,
-    pnlPercentage: portfolioMetrics.pnlPercentage,
-    activeSwaps: swapStats.activeSwaps,
-    userLevel: profile?.level || 1,
-    xpProgress: engagementMetrics.levelProgress
-  };
+  // Calculate global statistics with safe defaults
+  const globalStats = useMemo(() => ({
+    totalValue: typeof portfolioMetrics?.totalValueUSD === 'string' 
+      ? parseFloat(portfolioMetrics.totalValueUSD) 
+      : 0,
+    pnl24h: portfolioMetrics?.totalPnL24h ?? 0,
+    pnlPercentage: portfolioMetrics?.pnlPercentage ?? 0,
+    activeSwaps: swapStats?.activeSwaps ?? 0,
+    userLevel: profile?.level ?? 1,
+    xpProgress: engagementMetrics?.levelProgress ?? 0
+  }), [portfolioMetrics, swapStats, profile, engagementMetrics]);
+
+  // Show loading state if portfolio data is loading
+  if (portfolioLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-green-400 font-mono flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <motion.div 
+            className="w-16 h-16 border-4 border-green-400/30 border-t-green-400 rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
+          <div className="text-green-400 text-sm">Loading portfolio data...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen bg-slate-900 text-green-400 font-mono ${className}`}>
@@ -109,24 +116,45 @@ const Dashboard: React.FC<DashboardProps> = ({
             </motion.div>
           </div>
 
-          {/* Stats globales en header */}
+          {/* Global stats in header */}
           <div className="hidden lg:flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
               <DollarSign className="w-4 h-4" />
               <span className="text-slate-300">Portfolio:</span>
-              <span className="text-green-400 font-semibold">
-                ${globalStats.totalValue.toLocaleString()}
-              </span>
+              {portfolioLoading ? (
+                <motion.div 
+                  className="w-2 h-2 bg-green-400 rounded-full"
+                  animate={{ scale: [1, 1.5, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              ) : (
+                <span className="text-green-400 font-semibold">
+                  ${globalStats.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              )}
             </div>
             
             <div className="flex items-center space-x-2">
               <span className="text-slate-300">24h P&L:</span>
-              <span className={`font-semibold ${
-                globalStats.pnl24h >= 0 ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {globalStats.pnl24h >= 0 ? '+' : ''}${globalStats.pnl24h.toFixed(2)}
-                ({globalStats.pnlPercentage.toFixed(2)}%)
-              </span>
+              {portfolioLoading ? (
+                <motion.div 
+                  className="w-2 h-2 bg-green-400 rounded-full"
+                  animate={{ scale: [1, 1.5, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              ) : (
+                <span className={`font-semibold ${
+                  globalStats.pnl24h >= 0 ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {globalStats.pnl24h >= 0 ? '+' : ''}{globalStats.pnl24h.toLocaleString(undefined, { 
+                    style: 'currency', 
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                  {' '}({globalStats.pnlPercentage >= 0 ? '+' : ''}{globalStats.pnlPercentage.toFixed(2)}%)
+                </span>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
@@ -135,6 +163,13 @@ const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-amber-400 font-semibold">
                 {globalStats.activeSwaps}
               </span>
+              {globalStats.activeSwaps > 0 && (
+                <motion.div 
+                  className="w-1.5 h-1.5 bg-amber-400 rounded-full"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
@@ -142,6 +177,17 @@ const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-purple-400 font-semibold">
                 {globalStats.userLevel}
               </span>
+              {globalStats.xpProgress > 0 && (
+                <div className="w-16 h-1 bg-purple-900/30 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-purple-400"
+                    style={{ width: `${Math.min(globalStats.xpProgress, 100)}%` }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(globalStats.xpProgress, 100)}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -197,134 +243,27 @@ const Dashboard: React.FC<DashboardProps> = ({
         </nav>
       </header>
 
-      {/* Contenu principal */}
+      {/* Main content */}
       <main className="p-6">
-        <motion.div
-          key={`${activeTab}-${refreshKey}`}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={panelVariants}
-          transition={{ duration: 0.3 }}
-          className="space-y-6"
-        >
-          {/* Vue Overview */}
-          {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {/* Panel Portfolio résumé */}
-              <div className="lg:col-span-2">
-                <PortfolioSummary 
-                  walletAddress={walletAddress}
-                  isLoading={portfolioLoading}
-                />
-              </div>
-
-              {/* Panel Gamification */}
-              <div className="lg:col-span-1">
-                <GamificationPanel profile={profile} />
-              </div>
-
-              {/* Panel Market Overview */}
-              <div className="lg:col-span-3 xl:col-span-4">
-                <MarketOverview marketData={marketData} />
-              </div>
-
-              {/* Panel Trades actifs */}
-              <div className="lg:col-span-2">
-                <ActiveTrades />
-              </div>
-
-              {/* Panel Scanner arbitrage */}
-              <div className="lg:col-span-1 xl:col-span-2">
-                <ArbitrageScanner />
-              </div>
-            </div>
-          )}
-
-          {/* Vue Portfolio */}
-          {activeTab === 'portfolio' && (
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              <div className="xl:col-span-2">
-                <PortfolioSummary 
-                  walletAddress={walletAddress}
-                  isLoading={portfolioLoading}
-                  detailed={true}
-                />
-              </div>
-              <div>
-                <GamificationPanel profile={profile} expanded={true} />
-              </div>
-            </div>
-          )}
-
-          {/* Vue Trading */}
-          {activeTab === 'trading' && (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <div>
-                <SwapInterface walletAddress={walletAddress} />
-              </div>
-              <div className="space-y-6">
-                <ActiveTrades expanded={true} />
-                <ArbitrageScanner expanded={true} />
-              </div>
-            </div>
-          )}
-
-          {/* Vue Analytics */}
-          {activeTab === 'analytics' && (
-            <div className="space-y-6">
-              <div className="text-center py-12">
-                <TrendingUp className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-green-400 mb-2">
-                  Analytics Avancées
-                </h3>
-                <p className="text-slate-400">
-                  Corrélations cross-chain, matrices de liquidité et signaux de trading
-                </p>
-                <p className="text-sm text-amber-400 mt-2">
-                  🚧 En développement pour la phase 2 du hackathon
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Vue Community */}
-          {activeTab === 'community' && (
-            <div className="space-y-6">
-              <div className="text-center py-12">
-                <Globe className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-green-400 mb-2">
-                  Communauté DeFi
-                </h3>
-                <p className="text-slate-400">
-                  Insights partagés, leaderboard et récompenses NFT
-                </p>
-                <p className="text-sm text-amber-400 mt-2">
-                  🚧 Interface communautaire en cours de développement
-                </p>
-              </div>
-            </div>
-          )}
-        </motion.div>
+        <TabContent
+          activeTab={activeTab}
+          refreshKey={refreshKey}
+          walletAddress={walletAddress}
+          portfolioLoading={portfolioLoading}
+          marketData={marketData}
+          profile={profile || undefined}
+        />
       </main>
 
-      {/* Footer avec infos système */}
-      <footer className="border-t border-green-800/30 bg-slate-800/30 px-6 py-3">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <div className="flex items-center space-x-6">
-            <span>Last Update: {new Date(lastUpdate).toLocaleTimeString()}</span>
-            <span>APIs: 1inch + XRP Ledger</span>
-            <span>Network: {isConnected ? 'Online' : 'Offline'}</span>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <span>Hackathon Mode</span>
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          </div>
+      {/* System information footer */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-slate-800/50 backdrop-blur-sm border-t border-green-800/30 px-6 py-2">
+        <div className="flex justify-between text-xs text-slate-400">
+          <div>Last update: {new Date(lastUpdate).toLocaleTimeString()}</div>
+          <div>Version: 1.0.0-alpha</div>
         </div>
       </footer>
     </div>
   );
-};
+}
 
 export default Dashboard;

@@ -1,37 +1,58 @@
-// App.tsx - Point d'entrée principal de l'application
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-
 import Dashboard from './components/terminal/Dashboard';
 import { useProxyConnection } from './hooks/useProxyConnection';
-import { TestComponent } from './components/UI/TestComponent';
 
-// Simulation d'une connexion wallet pour la démo
+// Demo wallet connection simulation
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
 
 function App() {
-  console.log('App component rendering');
-  const [walletAddress] = useState<string | undefined>(DEMO_WALLET_ADDRESS);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Tester la connexion proxy au démarrage
+  const [walletAddress] = useState<string>(DEMO_WALLET_ADDRESS);
   const { isConnected, isLoading: proxyLoading, error: proxyError } = useProxyConnection();
-  
-  console.log('App state:', { isLoading, isConnected, proxyLoading, proxyError });
 
-  useEffect(() => {
-    // Simuler un temps de chargement initial
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  // Show error state if proxy connection fails
+  if (proxyError) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+        <div className="bg-slate-800 border border-red-600/50 rounded-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-400 text-2xl">⚠️</span>
+          </div>
+          
+          <h2 className="text-xl font-bold text-red-400 mb-2">
+            Connection Error
+          </h2>
+          
+          <p className="text-slate-400 mb-6">
+            {proxyError instanceof Error ? proxyError.message : 'Unable to connect to DeFi services'}
+          </p>
+          
+          <div className="text-left bg-slate-900/50 rounded-lg p-4 mb-6">
+            <h4 className="text-sm font-semibold text-slate-300 mb-2">
+              Quick Fix:
+            </h4>
+            <ol className="text-xs text-slate-400 space-y-1">
+              <li>1. Check your internet connection</li>
+              <li>2. Verify API configuration</li>
+              <li>3. Restart the application</li>
+            </ol>
+          </div>
+          
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 rounded-lg text-red-400 transition-colors"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Écran de chargement avec style terminal
-  if (isLoading) {
+  // Show loading state while proxy connection initializes
+  if (proxyLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <motion.div
@@ -61,51 +82,11 @@ function App() {
     );
   }
 
-  // Écran d'erreur de connexion proxy
-  if (proxyError && !isConnected) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-        <div className="bg-slate-800 border border-red-600/50 rounded-xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-red-400 text-2xl">⚠️</span>
-          </div>
-          
-          <h2 className="text-xl font-bold text-red-400 mb-2">
-            Connection Error
-          </h2>
-          
-          <p className="text-slate-400 mb-6">
-            Unable to connect to 1inch APIs. Please check your proxy configuration.
-          </p>
-          
-          <div className="text-left bg-slate-900/50 rounded-lg p-4 mb-6">
-            <h4 className="text-sm font-semibold text-slate-300 mb-2">
-              Quick Fix:
-            </h4>
-            <ol className="text-xs text-slate-400 space-y-1">
-              <li>1. Deploy proxy to Vercel</li>
-              <li>2. Set ONEINCH_API_KEY environment variable</li>
-              <li>3. Restart the application</li>
-            </ol>
-          </div>
-          
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-600/50 rounded-lg text-red-400 transition-colors"
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Main application content
   return (
     <div className="min-h-screen bg-slate-900">
-      {/* Dashboard principal */}
       <Dashboard walletAddress={walletAddress} />
       
-      {/* Système de notifications */}
       <Toaster
         position="top-right"
         toastOptions={{
@@ -132,10 +113,10 @@ function App() {
         }}
       />
 
-      {/* Indicateur de connexion proxy */}
+      {/* Connection status indicator */}
       <div className="fixed bottom-4 right-4 z-50">
         <AnimatePresence>
-          {!isConnected && !proxyLoading && (
+          {!isConnected && (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}

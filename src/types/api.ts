@@ -3,17 +3,21 @@
 // ========================================
 
 export interface MarketData {
-  price: number;
-  volume24h: number;
-  change24h: number;
-  high24h: number;
-  low24h: number;
-  marketCap: number;
+  price: string;
+  volume24h: string;
+  marketCap: string;
   lastUpdated: number;
   address: string;
   symbol: string;
   priceChange24h: number;
-  liquidity: number;
+  high24h?: number;
+  low24h?: number;
+  change24h?: number;
+  liquidity: {
+    usd: string;
+    base: string;
+    quote: string;
+  };
 }
 
 export interface SimpleChartData {
@@ -193,6 +197,12 @@ export interface ActiveTrade {
     sourceChain: string;
     destinationChain: string;
     atomicSwapId?: string;
+    stage: 'initiated' | 'escrow_deployed' | 'finality_confirmed' | 'secret_submitted' | 'completed';
+    progress: number;
+    lastUpdate: number;
+    orderHash?: string;
+    srcEscrowAddress?: string;
+    dstEscrowAddress?: string;
   };
   txHash?: string;
   explorerUrl?: string;
@@ -220,6 +230,46 @@ export interface ArbitrageOpportunity {
   netProfitUSD: string;
   discoveredAt: number;
   validUntil: number;
+}
+
+// ========================================
+// FUSION PLUS - Types for cross-chain swaps
+// ========================================
+
+export interface FusionPlusOrder {
+  salt: string;
+  makerAsset: string;
+  takerAsset: string;
+  maker: string;
+  receiver: string;
+  makingAmount: string;
+  takingAmount: string;
+  makerTraits: string;
+}
+
+export interface FusionPlusSubmitOrderRequest {
+  order: FusionPlusOrder;
+  srcChainId: number;
+  signature: string;
+  extension: string;
+  quoteId: string;
+  secretHashes: string[];
+}
+
+export interface FusionPlusSubmitSecretRequest {
+  secret: string;
+  orderHash: string;
+}
+
+export interface FusionPlusActiveOrder {
+  orderHash: string;
+  status: 'pending' | 'active' | 'filled' | 'cancelled';
+  srcEscrowAddress: string;
+  dstEscrowAddress: string;
+  chainFinality: boolean;
+  secretSubmitted: boolean;
+  createdAt: number;
+  updatedAt: number;
 }
 
 // ========================================

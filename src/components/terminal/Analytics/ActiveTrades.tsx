@@ -34,13 +34,44 @@ const ActiveTrades: React.FC<ActiveTradesProps> = ({
 
   const { activeTrades, tradeHistory } = useTradingStore();
 
-  // Combiner tous les trades (actifs + historique récent pour la démo)
+  // Calculate network-specific stats
+  const networkStats = {
+    eth: {
+      total: 0,
+      pending: 0,
+      completed: 0,
+      failed: 0
+    },
+    xrp: {
+      total: 0,
+      pending: 0,
+      completed: 0,
+      failed: 0
+    }
+  };
+
+  // Combine all trades and calculate stats
   const allTrades = [
     ...activeTrades,
     ...tradeHistory.slice(0, expanded ? 10 : 3)
-  ];
+  ].map(trade => {
+    // Update network stats
+    if (trade.type === 'fusion_plus' || trade.type === 'classic') {
+      networkStats.eth.total++;
+      if (trade.status === 'pending' || trade.status === 'processing') networkStats.eth.pending++;
+      if (trade.status === 'completed') networkStats.eth.completed++;
+      if (trade.status === 'failed') networkStats.eth.failed++;
+    }
+    if (trade.type === 'orderbook' || (trade.crossChainDetails?.destinationChain === 'xrp')) {
+      networkStats.xrp.total++;
+      if (trade.status === 'pending' || trade.status === 'processing') networkStats.xrp.pending++;
+      if (trade.status === 'completed') networkStats.xrp.completed++;
+      if (trade.status === 'failed') networkStats.xrp.failed++;
+    }
+    return trade;
+  });
 
-  // Ajouter quelques trades simulés pour la démo
+  // Add mock trades for demo purposes
   const mockTrades: ActiveTrade[] = [
     {
       id: 'demo_trade_1',
@@ -132,13 +163,29 @@ const ActiveTrades: React.FC<ActiveTradesProps> = ({
     }
   };
 
-  // Calculer les statistiques
+  // Calculer les statistiques globales et par réseau
   const stats = {
     total: combinedTrades.length,
     pending: combinedTrades.filter(t => t.status === 'pending').length,
     processing: combinedTrades.filter(t => t.status === 'processing').length,
     completed: combinedTrades.filter(t => t.status === 'completed').length,
-    failed: combinedTrades.filter(t => t.status === 'failed').length
+    failed: combinedTrades.filter(t => t.status === 'failed').length,
+    networks: {
+      ethereum: {
+        total: combinedTrades.filter(t => t.type === 'classic' || t.type === 'fusion_plus').length,
+        pending: combinedTrades.filter(t => (t.type === 'classic' || t.type === 'fusion_plus') && t.status === 'pending').length,
+        processing: combinedTrades.filter(t => (t.type === 'classic' || t.type === 'fusion_plus') && t.status === 'processing').length,
+        completed: combinedTrades.filter(t => (t.type === 'classic' || t.type === 'fusion_plus') && t.status === 'completed').length,
+        failed: combinedTrades.filter(t => (t.type === 'classic' || t.type === 'fusion_plus') && t.status === 'failed').length
+      },
+      xrp: {
+        total: combinedTrades.filter(t => t.type === 'orderbook' || t.crossChainDetails?.destinationChain === 'xrp').length,
+        pending: combinedTrades.filter(t => (t.type === 'orderbook' || t.crossChainDetails?.destinationChain === 'xrp') && t.status === 'pending').length,
+        processing: combinedTrades.filter(t => (t.type === 'orderbook' || t.crossChainDetails?.destinationChain === 'xrp') && t.status === 'processing').length,
+        completed: combinedTrades.filter(t => (t.type === 'orderbook' || t.crossChainDetails?.destinationChain === 'xrp') && t.status === 'completed').length,
+        failed: combinedTrades.filter(t => (t.type === 'orderbook' || t.crossChainDetails?.destinationChain === 'xrp') && t.status === 'failed').length
+      }
+    }
   };
 
   return (
@@ -169,6 +216,7 @@ const ActiveTrades: React.FC<ActiveTradesProps> = ({
         </div>
 
         {/* Stats overview */}
+        {/* Global Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4 p-4 bg-slate-900/50 rounded-lg">
           <div className="text-center">
             <div className="text-lg font-bold text-blue-400">{stats.total}</div>
@@ -187,6 +235,81 @@ const ActiveTrades: React.FC<ActiveTradesProps> = ({
               {stats.total > 0 ? ((stats.completed / stats.total) * 100).toFixed(0) : '0'}%
             </div>
             <div className="text-xs text-slate-400">Success Rate</div>
+          </div>
+        </div>
+
+        {/* Network-specific Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {/* Ethereum Network */}
+          <div className="p-4 bg-slate-900/50 rounded-lg border border-blue-900/30">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+              <span className="text-sm font-medium text-blue-400">Ethereum Network</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-slate-400">Active</div>
+                <div className="text-lg font-bold text-blue-400">
+                  {stats.networks.ethereum.processing}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Total</div>
+                <div className="text-lg font-bold text-slate-300">
+                  {stats.networks.ethereum.total}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Success Rate</div>
+                <div className="text-sm font-bold text-green-400">
+                  {stats.networks.ethereum.total > 0 
+                    ? ((stats.networks.ethereum.completed / stats.networks.ethereum.total) * 100).toFixed(0)
+                    : '0'}%
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Failed</div>
+                <div className="text-sm font-bold text-red-400">
+                  {stats.networks.ethereum.failed}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* XRP Network */}
+          <div className="p-4 bg-slate-900/50 rounded-lg border border-green-900/30">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              <span className="text-sm font-medium text-green-400">XRP Network</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-slate-400">Active</div>
+                <div className="text-lg font-bold text-green-400">
+                  {stats.networks.xrp.processing}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Total</div>
+                <div className="text-lg font-bold text-slate-300">
+                  {stats.networks.xrp.total}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Success Rate</div>
+                <div className="text-sm font-bold text-green-400">
+                  {stats.networks.xrp.total > 0 
+                    ? ((stats.networks.xrp.completed / stats.networks.xrp.total) * 100).toFixed(0)
+                    : '0'}%
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400">Failed</div>
+                <div className="text-sm font-bold text-red-400">
+                  {stats.networks.xrp.failed}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

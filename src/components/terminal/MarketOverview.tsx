@@ -13,7 +13,6 @@ import { formatCurrency, formatPercentage, getPriceChangeColor } from '../../uti
 interface MarketOverviewProps {
   marketData: Record<string, MarketData>;
   className?: string;
-  detailed?: boolean;
 }
 
 type FilterType = 'all' | 'gainers' | 'losers';
@@ -40,11 +39,10 @@ const MOCK_MARKET_DATA: MarketData[] = [
   // Add more mock data as needed
 ];
 
-const MarketData: React.FC<MarketOverviewProps> = ({ 
+export const MarketOverview: React.FC<MarketOverviewProps> = ({ 
   marketData,
   className = '' 
 }) => {
-  console.log('MarketData component:', { marketData });
   const [filter, setFilter] = useState<FilterType>('all');
   const [timeframe, setTimeframe] = useState<TimeframeType>('24h');
 
@@ -85,7 +83,7 @@ const MarketData: React.FC<MarketOverviewProps> = ({
   };
 
   return (
-    <div className={`rounded-lg bg-slate-800/50 backdrop-blur-sm min-h-[200px] ${className}`} style={{ border: '1px solid red' }}>
+    <div className={`rounded-lg bg-slate-800/50 backdrop-blur-sm ${className}`}>
       {/* Market Overview Header */}
       <div className="p-6 border-b border-slate-700/50">
         <div className="flex items-center justify-between mb-6">
@@ -263,4 +261,4 @@ const MarketData: React.FC<MarketOverviewProps> = ({
   );
 };
 
-export default MarketData;
+export default MarketOverview;

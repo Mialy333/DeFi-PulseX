@@ -26,11 +26,13 @@ interface TradingState {
   // Actions pour gérer les trades
   addActiveTrade: (trade: ActiveTrade) => void;
   updateTradeStatus: (tradeId: string, status: ActiveTrade['status']) => void;
+  updateTrade: (tradeId: string, updates: Partial<ActiveTrade>) => void;
   completeTrade: (tradeId: string, actualAmount: string, txHash: string) => void;
   
   // Actions pour les swaps cross-chain
   initiateCrossChainSwap: (swap: XRPAtomicSwap) => void;
   updateSwapStatus: (swapId: string, status: XRPAtomicSwap['status']) => void;
+  updateCrossChainDetails: (tradeId: string, details: Partial<ActiveTrade['crossChainDetails']>) => void;
   
   // Configuration
   setSlippage: (slippage: number) => void;
@@ -57,6 +59,13 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
   updateTradeStatus: (tradeId, status) => set((state) => ({
     activeTrades: state.activeTrades.map(trade =>
       trade.id === tradeId ? { ...trade, status } : trade
+    )
+  })),
+
+  // Mettre à jour un trade avec des modifications partielles
+  updateTrade: (tradeId, updates) => set((state) => ({
+    activeTrades: state.activeTrades.map(trade =>
+      trade.id === tradeId ? { ...trade, ...updates } : trade
     )
   })),
 
@@ -87,6 +96,21 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
   updateSwapStatus: (swapId, status) => set((state) => ({
     crossChainSwaps: state.crossChainSwaps.map(swap =>
       swap.swapId === swapId ? { ...swap, status } : swap
+    )
+  })),
+
+  updateCrossChainDetails: (tradeId, details) => set((state) => ({
+    activeTrades: state.activeTrades.map(trade =>
+      trade.id === tradeId && trade.crossChainDetails
+        ? {
+            ...trade,
+            crossChainDetails: {
+              ...trade.crossChainDetails,
+              ...details,
+              lastUpdate: Date.now()
+            }
+          }
+        : trade
     )
   })),
 
