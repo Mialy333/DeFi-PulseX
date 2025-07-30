@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./index.html",
   ],
   theme: {
     extend: {
@@ -20,11 +20,10 @@ export default {
           900: '#134e4a',
           950: '#042f2e',
         },
-        // Dark mode colors
         dark: {
-          100: '#1e293b', // slate-800
-          200: '#0f172a', // slate-900
-          300: '#020617', // slate-950
+          100: '#1e293b',
+          200: '#0f172a',
+          300: '#020617',
         },
       },
       animation: {
@@ -33,7 +32,5 @@ export default {
       },
     },
   },
-  darkMode: 'class',
-  presets: [require('tailwindcss/defaultConfig')],
   plugins: [],
 }
