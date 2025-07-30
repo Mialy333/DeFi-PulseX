@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useMarketStore } from '../store/marketStore';
 import { createOneInchAPI } from '../services/api/oneinch';
-import { MarketData, ChartData } from '../types/api';
+import type { MarketData, ChartData } from '../types/api';
 
 interface UseRealTimeDataProps {
   tokens: string[]; // Adresses des tokens à surveiller

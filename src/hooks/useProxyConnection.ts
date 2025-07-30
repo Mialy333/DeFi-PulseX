@@ -1,19 +1,27 @@
 import { useState, useEffect } from 'react';
 
-export function useProxyConnection() {
+export const useProxyConnection = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Simulez une connexion API (remplacez par votre logique réelle)
-    const timer = setTimeout(() => {
-      setIsConnected(true);
-      setIsLoading(false);
-    }, 1000);
+    const checkConnection = async () => {
+      try {
+        // Simulate API check
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setIsConnected(true);
+        setError(null);
+      } catch (err) {
+        setError(err as Error);
+        setIsConnected(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    checkConnection();
   }, []);
 
   return { isConnected, isLoading, error };
-}
+};

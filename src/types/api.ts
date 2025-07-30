@@ -1,40 +1,48 @@
-export interface OneInchResponse<T> {
-  data: T;
-  success: boolean;
-  error?: string;
+export interface MarketData {
+  price: number;
+  volume24h: number;
+  change24h: number;
+  high24h: number;
+  low24h: number;
+  marketCap: number;
 }
 
-export interface SwapQuote {
+export interface SimpleChartData {
+  timestamp: number;
+  price: number;
+  volume: number;
+}
+
+export interface QuoteResponse {
   fromToken: {
     address: string;
     symbol: string;
-    name: string;
     decimals: number;
-    logoURI: string;
   };
   toToken: {
     address: string;
     symbol: string;
-    name: string;
     decimals: number;
-    logoURI: string;
   };
-  fromAmount: string;  
-  toAmount: string;    
+  toTokenAmount: string;
+  estimatedGas: number;
   protocols: Array<{
     name: string;
     part: number;
     fromTokenAddress: string;
     toTokenAddress: string;
   }>;
-  estimatedGas: string;
-  tx: {
-    from: string;
-    to: string;
-    data: string;
-    value: string;
-    gasPrice: string;
-    gas: string;
+}
+
+export interface TokenList {
+  tokens: {
+    [address: string]: {
+      symbol: string;
+      name: string;
+      decimals: number;
+      address: string;
+      logoURI?: string;
+    };
   };
 }
 

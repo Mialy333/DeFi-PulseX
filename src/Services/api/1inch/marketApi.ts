@@ -1,5 +1,5 @@
 // src/services/api/1inch/marketApi.ts
-import { MarketData, ChartData } from '../../../types/api';
+import type { MarketData, ChartData } from '../../../types/api';
 import OneInchClient, { getOneInchClient } from './client';
 
 export class MarketAPI {

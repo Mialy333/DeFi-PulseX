@@ -1,13 +1,11 @@
 // components/terminal/SwapInterface.tsx - Interface de swap cross-chain
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowDownUp, 
   Zap, 
   Clock, 
   Shield, 
-  AlertCircle, 
-  CheckCircle,
   Loader2,
   TrendingUp,
   Info,
@@ -35,7 +33,17 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
   const [isCalculating, setIsCalculating] = useState(false);
-  const [swapEstimate, setSwapEstimate] = useState<any>(null);
+  interface SwapEstimate {
+    inputAmount: number;
+    outputAmount: number;
+    exchangeRate: number;
+    networkFee: number;
+    slippage: number;
+    priceImpact: number;
+    estimatedTime: string;
+  }
+
+  const [swapEstimate, setSwapEstimate] = useState<SwapEstimate | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Hooks
@@ -52,10 +60,10 @@ const SwapInterface: React.FC<SwapInterfaceProps> = ({
   const { marketData } = useMarketStore();
 
   // Prix de référence (simulés pour la démo)
-  const prices = {
+  const prices = useMemo(() => ({
     ETH: 2000, // $2000 par ETH
-    XRP: 0.50   // $0.50 par XRP
-  };
+    XRP: 0.50  // $0.50 par XRP
+  }), []);
 
   // Calculer le montant de sortie estimé
   const calculateOutput = useCallback(async (input: string) => {

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { MarketData, ChartData, ArbitrageOpportunity } from '../types/api';
+import type { MarketData, ChartData, ArbitrageOpportunity } from '../types/api';
 
 interface MarketState {
   // Données de marché en temps réel - Le cœur du terminal

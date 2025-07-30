@@ -1,4 +1,5 @@
 // App.tsx - Point d'entrée principal de l'application
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,11 +11,14 @@ import { useProxyConnection } from './hooks/useProxyConnection';
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
 
 function App() {
+  console.log('App component rendering');
   const [walletAddress] = useState<string | undefined>(DEMO_WALLET_ADDRESS);
   const [isLoading, setIsLoading] = useState(true);
   
   // Tester la connexion proxy au démarrage
   const { isConnected, isLoading: proxyLoading, error: proxyError } = useProxyConnection();
+  
+  console.log('App state:', { isLoading, isConnected, proxyLoading, proxyError });
 
   useEffect(() => {
     // Simuler un temps de chargement initial
@@ -74,9 +78,9 @@ function App() {
           </p>
           
           <div className="text-left bg-slate-900/50 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-semibold text-slate-300 mb-2">
+            <h4 className="text-sm font-semibold text-slate-300 mb-2">
               Quick Fix:
-            </h3>
+            </h4>
             <ol className="text-xs text-slate-400 space-y-1">
               <li>1. Deploy proxy to Vercel</li>
               <li>2. Set ONEINCH_API_KEY environment variable</li>
@@ -96,7 +100,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="min-h-screen bg-slate-900">
       {/* Dashboard principal */}
       <Dashboard walletAddress={walletAddress} />
       
@@ -127,7 +131,7 @@ function App() {
         }}
       />
 
-      {/* Indicateur de connexion proxy en bas de l'écran */}
+      {/* Indicateur de connexion proxy */}
       <div className="fixed bottom-4 right-4 z-50">
         <AnimatePresence>
           {!isConnected && !proxyLoading && (
