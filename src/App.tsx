@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,7 +6,7 @@ import { WagmiProvider } from "wagmi";
 import Dashboard from './components/terminal/Dashboard';
 import { useProxyConnection } from './hooks/useProxyConnection';
 import { config } from './config/wagmi';
-import WalletConnect from './components/WalletConnect';
+import Navbar from './components/Navbar';
 
 // Demo wallet connection simulation
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
@@ -15,18 +14,34 @@ const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
 const queryClient = new QueryClient();
 
 function App() {
-  const [walletAddress] = useState<string>(DEMO_WALLET_ADDRESS);
+  const [walletAddress, setWalletAddress] = useState<string | undefined>();
   const { isConnected, isLoading: proxyLoading, error: proxyError } = useProxyConnection();
+
+  const handleConnectWallet = useCallback(async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        // Request account access
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+      } catch (error) {
+        console.error('Error connecting to MetaMask', error);
+      }
+    } else {
+      window.open('https://metamask.io/download/', '_blank');
+    }
+  }, []);
 
   // Show error state if proxy connection fails
   if (proxyError) {
     return (
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-            <div className="bg-slate-800 border border-red-600/50 rounded-xl p-8 max-w-md w-full text-center">
-              <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-red-400 text-2xl">⚠️</span>
+          <div className="min-h-screen" style={{ backgroundColor: 'rgb(8, 3, 12)' }}>
+            <Navbar walletAddress={walletAddress} onConnectWallet={handleConnectWallet} />
+            <div className="flex items-center justify-center p-6">
+              <div className="bg-slate-800 border border-red-600/50 rounded-xl p-8 max-w-md w-full text-center">
+                <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-red-400 text-2xl">⚠️</span>
               </div>
               
               <h2 className="text-xl font-bold text-red-400 mb-2">
@@ -56,6 +71,7 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
         </QueryClientProvider>
       </WagmiProvider>
     );

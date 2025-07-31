@@ -302,12 +302,14 @@ const TabContent: React.FC<TabContentProps> = ({
       {/* Trading Tab */}
       {activeTab === 'trading' && (
         <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-8">
-            <SwapInterface walletAddress={walletAddress} />
-          </div>
-          <div className="col-span-4 space-y-6">
-            <ActiveTrades expanded={true} />
+          <div className="col-span-6">
             <ArbitrageScanner expanded={true} />
+          </div>
+          <div className="col-span-6">
+            <SwapInterface 
+              walletAddress={walletAddress}
+              mode="cross-chain"
+            />
           </div>
         </div>
       )}
@@ -315,12 +317,112 @@ const TabContent: React.FC<TabContentProps> = ({
       {/* Analytics Tab */}
       {activeTab === 'analytics' && (
         <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-8 space-y-6">
-            <ActiveTrades expanded={true} />
-            <ArbitrageScanner expanded={true} />
+          {/* Main Chart Area */}
+          <div className="col-span-9">
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl">
+              <Charts 
+                type="trading"
+                showTools={true}
+                data={[]} // Will be connected to real data
+                timeframes={['1m', '5m', '15m', '30m', '1h', '4h', '1D', '1W']}
+                indicators={[
+                  'MA', 'EMA', 'RSI', 'MACD', 'BB', 'Volume',
+                  'Fibonacci', 'Support/Resistance'
+                ]}
+                drawingTools={[
+                  'horizontalLine', 'trendLine', 'fibonacci',
+                  'rectangle', 'pitchfork', 'brush'
+                ]}
+              />
+            </div>
           </div>
-          <div className="col-span-4">
-            <MarketDataView marketData={marketData} detailed={true} />
+
+          {/* Right Sidebar */}
+          <div className="col-span-3 space-y-6">
+            {/* Market Overview Mini */}
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+              <h3 className="text-sm font-medium text-slate-400 mb-3">Market Overview</h3>
+              <div className="space-y-2">
+                {['BTC', 'ETH', 'BNB', 'SOL', 'ADA'].map(symbol => (
+                  <div key={symbol} className="flex items-center justify-between text-sm">
+                    <span className="text-slate-300">{symbol}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-200">${symbol === 'BTC' ? '43,567.89' : '2,345.67'}</span>
+                      <span className="text-green-400">+2.45%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Technical Indicators */}
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+              <h3 className="text-sm font-medium text-slate-400 mb-3">Technical Analysis</h3>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-slate-300">RSI (14)</span>
+                    <span className="text-slate-200">65.4</span>
+                  </div>
+                  <div className="w-full bg-slate-700/50 rounded-full h-2">
+                    <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '65.4%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-slate-300">MACD</span>
+                    <span className="text-green-400">Bullish</span>
+                  </div>
+                  <div className="w-full bg-slate-700/50 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '80%' }}></div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="text-slate-300">MA Cross</span>
+                    <span className="text-green-400">Golden Cross</span>
+                  </div>
+                  <div className="w-full bg-slate-700/50 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '90%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Support/Resistance Levels */}
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+              <h3 className="text-sm font-medium text-slate-400 mb-3">Key Levels</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-red-400">R3</span>
+                  <span className="text-slate-200">$45,780</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-red-400">R2</span>
+                  <span className="text-slate-200">$44,550</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-red-400">R1</span>
+                  <span className="text-slate-200">$43,890</span>
+                </div>
+                <div className="flex items-center justify-between text-sm font-medium">
+                  <span className="text-slate-300">Current</span>
+                  <span className="text-green-400">$43,567</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-green-400">S1</span>
+                  <span className="text-slate-200">$43,120</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-green-400">S2</span>
+                  <span className="text-slate-200">$42,450</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-green-400">S3</span>
+                  <span className="text-slate-200">$41,780</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

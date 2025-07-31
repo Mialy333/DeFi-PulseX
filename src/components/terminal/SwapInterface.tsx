@@ -19,13 +19,15 @@ import { useMarketStore } from '../../store/marketStore';
 interface SwapInterfaceProps {
   walletAddress?: string;
   className?: string;
+  mode?: 'standard' | 'cross-chain';
 }
 
-type SwapDirection = 'ETH_to_XRP' | 'XRP_to_ETH';
+type SwapDirection = 'ETH_to_XRP' | 'XRP_to_ETH' | 'ETH_to_BSC' | 'BSC_to_ETH' | 'SOL_to_ETH' | 'ETH_to_SOL';
 
 const SwapInterface: React.FC<SwapInterfaceProps> = ({ 
   walletAddress, 
-  className = '' 
+  className = '',
+  mode = 'standard'
 }) => {
   // États du swap
   const [direction, setDirection] = useState<SwapDirection>('ETH_to_XRP');
