@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 
 import { useMetaMaskPortfolio } from '../../hooks/useMetaMaskPortfolio';
+import WalletConnect from '../../components/WalletConnect';
 
 interface PortfolioSummaryProps {
   walletAddress?: string;
@@ -58,9 +59,9 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
           <p className="text-sm text-slate-500">
             View your MetaMask portfolio and track performance
           </p>
-          <button className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors">
-            Connect Wallet
-          </button>
+          <div className="mt-4">
+            <WalletConnect />
+          </div>
         </div>
       </div>
     );
@@ -85,26 +86,32 @@ const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowBalances(!showBalances)}
-              className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
-            >
-              {showBalances ? (
-                <Eye className="w-4 h-4 text-slate-400" />
-              ) : (
-                <EyeOff className="w-4 h-4 text-slate-400" />
-              )}
-            </button>
-            
-            <motion.button
-              onClick={() => window.location.reload()}
-              className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
-              whileTap={{ rotate: 180 }}
-              disabled={portfolioData.isLoading}
-            >
-              <RefreshCw className={`w-4 h-4 text-slate-400 ${portfolioData.isLoading ? 'animate-spin' : ''}`} />
-            </motion.button>
+          <div className="flex items-center space-x-4">
+            {!walletAddress ? (
+              <WalletConnect />
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowBalances(!showBalances)}
+                  className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
+                >
+                  {showBalances ? (
+                    <Eye className="w-4 h-4 text-slate-400" />
+                  ) : (
+                    <EyeOff className="w-4 h-4 text-slate-400" />
+                  )}
+                </button>
+                
+                <motion.button
+                  onClick={() => window.location.reload()}
+                  className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
+                  whileTap={{ rotate: 180 }}
+                  disabled={portfolioData.isLoading}
+                >
+                  <RefreshCw className={`w-4 h-4 text-slate-400 ${portfolioData.isLoading ? 'animate-spin' : ''}`} />
+                </motion.button>
+              </>
+            )}
           </div>
         </div>
       </div>

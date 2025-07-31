@@ -32,11 +32,21 @@ const Dashboard: React.FC<DashboardProps> = ({
   className = '' 
 }) => {
   const [activeTab, setActiveTab] = useState<TerminalTab>('overview');
+  const { markPlatformUsage } = useGamification(walletAddress);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [hasMarkedUsage, setHasMarkedUsage] = useState(false);
 
-  // Hooks pour les données
+  // Hooks for data
   const { marketData, isConnected, lastUpdate } = useMarketStore();
+  
+  // Mark platform usage when wallet connects
+  React.useEffect(() => {
+    if (walletAddress && !hasMarkedUsage) {
+      markPlatformUsage();
+      setHasMarkedUsage(true);
+    }
+  }, [walletAddress, hasMarkedUsage, markPlatformUsage]);
   console.log('Dashboard marketData:', marketData, 'isConnected:', isConnected);
   const { refresh } = use1InchMarketData({
     tokens: [

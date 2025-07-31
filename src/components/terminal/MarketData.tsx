@@ -10,10 +10,26 @@ import {
 import type { MarketData } from '../../types/api';
 import { formatCurrency, formatPercentage, getPriceChangeColor } from '../../utils/formatters';
 
+interface Tokenomics {
+  burningMechanism: string;
+  stakingYield: string;
+  inflationRate: number;
+  totalStaked: string;
+}
+
+interface TokenData extends MarketData {
+  name: string;
+  circulatingSupply: number;
+  maxSupply: number | null;
+  tokenomics: Tokenomics;
+}
+
 interface MarketOverviewProps {
   marketData: Record<string, MarketData>;
   className?: string;
   detailed?: boolean;
+  showTokenomics?: boolean;
+  assets?: TokenData[];
 }
 
 type FilterType = 'all' | 'gainers' | 'losers';

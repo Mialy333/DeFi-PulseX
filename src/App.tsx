@@ -101,17 +101,12 @@ function App() {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-slate-900">
-          <div className="px-6 py-4 border-b border-slate-800">
-            <div className="flex justify-between items-center max-w-7xl mx-auto">
-              <h1 className="text-xl font-bold text-white">DeFi PulseX Pro</h1>
-              <WalletConnect />
-            </div>
-          </div>
+          {/* Removed top navbar */}
           <Dashboard walletAddress={walletAddress} />
           <Toaster
             position="top-right"
             toastOptions={{
-              duration: 4000,
+              duration: 2000,
               style: {
                 background: '#1e293b',
                 color: '#e2e8f0',

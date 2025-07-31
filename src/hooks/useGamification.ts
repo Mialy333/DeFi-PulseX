@@ -15,16 +15,17 @@ export const useGamification = (walletAddress?: string) => {
     setProfile
   } = useUserStore();
 
-  // Initialiser le profil utilisateur
+  // Initialize user profile only once
   useEffect(() => {
     if (walletAddress && !profile) {
-      // Créer un nouveau profil ou le récupérer depuis une API
+      // Create a new profile or fetch from API
+      const today = new Date().toISOString().split('T')[0];
       const newProfile = {
         walletAddress,
         totalXP: 0,
         level: 1,
         dailyStreak: 0,
-        lastActiveDate: new Date().toISOString().split('T')[0],
+        lastActiveDate: today,
         todayActivities: {
           platformUsed: false,
           commentPosted: false,
@@ -41,47 +42,47 @@ export const useGamification = (walletAddress?: string) => {
     }
   }, [walletAddress, profile, setProfile]);
 
-  // Marquer l'utilisation quotidienne de la plateforme
+  // Track daily platform usage
   const markPlatformUsage = useCallback(() => {
     if (profile && !profile.todayActivities.platformUsed) {
       markDailyActivity('platformUsed');
-      toast.success('🎉 +20 XP pour votre utilisation quotidienne !');
+      toast.success('🎉 +20 XP for your daily use', { duration: 2000 });
     }
   }, [profile, markDailyActivity]);
 
-  // Récompenser un commentaire pertinent
+  // Reward relevant comments
   const rewardComment = useCallback(() => {
     if (profile && !profile.todayActivities.commentPosted) {
       markDailyActivity('commentPosted');
-      toast.success('💬 +20 XP pour votre contribution à la communauté !');
+      toast.success('💬 +20 XP for your comment!', { duration: 2000 });
     }
   }, [profile, markDailyActivity]);
 
-  // Récompenser un trade exécuté
+  // Reward executed trades
   const rewardTrade = useCallback(() => {
     if (profile && !profile.todayActivities.tradeExecuted) {
       markDailyActivity('tradeExecuted');
-      toast.success('🔄 +10 XP pour votre trade !');
+      toast.success('🔄 +10 XP for your trade!', { duration: 2000 });
     }
   }, [profile, markDailyActivity]);
 
-  // Réclamer un NFT avec animation
+  // Claim NFT with animation
   const claimNFTWithAnimation = useCallback(async (nftId: string) => {
     const nft = availableNFTs.find(n => n.id === nftId);
     if (!nft) return;
 
     try {
       claimNFT(nftId);
-      toast.success(`🏆 NFT "${nft.name}" réclamé avec succès !`, {
+      toast.success(`🏆 NFT "${nft.name}" redeemed successfully !`, {
         duration: 4000,
         icon: '✨'
       });
     } catch (error) {
-      toast.error('Erreur lors de la réclamation du NFT');
+      toast.error('Error during the NFT redeem');
     }
   }, [availableNFTs, claimNFT]);
 
-  // Calculer les métriques d'engagement
+  // Calculate engagement metrics
   const engagementMetrics = {
     completionRate: profile ? (
       (Number(profile.todayActivities.platformUsed) +
@@ -96,15 +97,8 @@ export const useGamification = (walletAddress?: string) => {
     nextReward: availableNFTs.length > 0 ? availableNFTs[0] : null
   };
 
-  // Marquer automatiquement l'usage de la plateforme au premier rendu
-  useEffect(() => {
-    if (profile) {
-      markPlatformUsage();
-    }
-  }, [profile, markPlatformUsage]);
-
   return {
-    // État du profil
+    // Profile state
     profile,
     xpToNextLevel,
     dailyXPEarned,
@@ -117,6 +111,6 @@ export const useGamification = (walletAddress?: string) => {
     rewardComment,
     rewardTrade,
     claimNFTWithAnimation,
-    addXP // Pour des récompenses custom
+    addXP // For custom rewards
   };
 };
