@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useMarketStore } from '../store/marketStore';
-import { getOneInchService } from '../services/api/oneinch';
+import { getOneInchService } from '../services/api/oneinch/index';
 import { OneInchWebSocket } from '../services/api/oneinch/websocket';
 import type { MarketData, WebSocketResponse } from '../types/api';
 
