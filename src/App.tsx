@@ -3,10 +3,12 @@ import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './components/terminal/Dashboard';
 import { useProxyConnection } from './hooks/useProxyConnection';
 import { config } from './config/wagmi';
 import Navbar from './components/Navbar';
+import Community from './components/community/Community';
 
 // Demo wallet connection simulation
 const DEMO_WALLET_ADDRESS = '0x742d35Cc5b8C8CBE8f3B2b4B8e5D8C8b8c8c8c8c';
@@ -116,40 +118,46 @@ function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-slate-900">
-          {/* Removed top navbar */}
-          <Dashboard walletAddress={walletAddress} />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 2000,
-              style: {
-                background: '#1e293b',
-                color: '#e2e8f0',
-                border: '1px solid rgba(51, 65, 85, 0.5)'
-              }
-            }}
-          />
+        <BrowserRouter>
+          <div className="min-h-screen bg-slate-900">
+            <Navbar walletAddress={walletAddress} onConnectWallet={handleConnectWallet} />
+            <Routes>
+              <Route path="/" element={<Dashboard walletAddress={walletAddress} />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 2000,
+                style: {
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid rgba(51, 65, 85, 0.5)'
+                }
+              }}
+            />
 
-          {/* Connection status indicator */}
-          <div className="fixed bottom-4 right-4 z-50">
-            <AnimatePresence>
-              {!isConnected && (
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 50 }}
-                  className="bg-amber-900/90 border border-amber-600/50 rounded-lg px-4 py-2 backdrop-blur-sm"
-                >
-                  <div className="flex items-center space-x-2 text-amber-400">
-                    <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium">Connecting to APIs...</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Connection status indicator */}
+            <div className="fixed bottom-4 right-4 z-50">
+              <AnimatePresence>
+                {!isConnected && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
+                    className="bg-amber-900/90 border border-amber-600/50 rounded-lg px-4 py-2 backdrop-blur-sm"
+                  >
+                    <div className="flex items-center space-x-2 text-amber-400">
+                      <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                      <span className="text-sm font-medium">Connecting to APIs...</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
+        </BrowserRouter>
       </QueryClientProvider>
     </WagmiProvider>
   );
