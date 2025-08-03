@@ -1,4 +1,14 @@
-// src/services/api/1inch/index.ts
+export * from './client';
+export * from './service';
+export * from './websocket';
+export * from './swapApi';
+export * from './portfolioApi';
+export * from './marketApi';
+export * from './fusionPlus';
+export * from './fusionPlusApi';
+export * from './historyApi';
+
+// Main API class for convenience
 import { SwapAPI } from './swapApi';
 import { PortfolioAPI } from './portfolioApi';
 import { MarketAPI } from './marketApi';
