@@ -1,5 +1,6 @@
 // src/services/api/1inch/client.ts
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 class OneInchClient {
   private client: AxiosInstance;

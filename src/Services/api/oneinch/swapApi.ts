@@ -1,8 +1,8 @@
 import { getOneInchClient } from './client';
-import { SwapQuote, ActiveTrade } from '../../../types/api';
+import type { SwapQuote, ActiveTrade, SwapData } from '../../../types/trading';
 
 export class SwapAPI {
-  private client: OneInchClient;
+  private client;
 
   constructor(apiKey: string) {
     this.client = getOneInchClient(apiKey);
@@ -61,19 +61,14 @@ export class SwapAPI {
         }
       });
 
-      // Créer un objet ActiveTrade pour le tracking
+      // Create an ActiveTrade object for tracking
       const trade: ActiveTrade = {
         id: `trade_${Date.now()}`,
-        type: 'classic',
         fromToken: fromTokenAddress,
         toToken: toTokenAddress,
-        fromAmount: amount,
-        expectedAmount: swapData.toAmount,
+        amount: amount,
         status: 'pending',
-        createdAt: Date.now(),
-        estimatedGas: swapData.tx.gas,
-        gasPrice: swapData.tx.gasPrice,
-        networkFee: (parseInt(swapData.tx.gas) * parseInt(swapData.tx.gasPrice)).toString()
+        timestamp: Date.now()
       };
 
       return trade;
@@ -95,7 +90,7 @@ export class SwapAPI {
     try {
       // Cette API est plus complexe et nécessite le SDK TypeScript
       // Voir la documentation Fusion+ dans les documents fournis
-      const orderData = await this.client.request({
+      const orderData: { orderHash: string } = await this.client.request({
         method: 'POST',
         url: '/fusion-plus/v1.0/orders',
         data: {
