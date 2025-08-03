@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useMarketStore } from '../store/marketStore';
-import { getOneInchService } from '../services/api/1inch/service';
-import type { SwapQuoteParams, SwapExecuteParams } from '../types/api';
+import { getOneInchService } from '../services/api/oneinch';
+import type { SwapQuoteParams, SwapExecuteParams } from '../types/swap';
 
 export const use1InchSwap = (walletAddress?: string) => {
   const { updateSwapStatus, setError } = useMarketStore();

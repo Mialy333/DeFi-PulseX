@@ -9,6 +9,18 @@ export interface SwapQuoteParams {
   slippage?: number;
 }
 
+export interface SwapQuote {
+  fromTokenAmount: string;
+  toTokenAmount: string;
+  estimatedGas: string;
+  route: string[];
+  data?: string;
+  tx?: {
+    gas: string;
+    gasPrice: string;
+  };
+}
+
 export interface SwapExecuteParams extends SwapQuoteParams {
   fromAddress: string;
 }
