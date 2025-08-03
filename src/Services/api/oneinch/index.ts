@@ -1,60 +1,41 @@
-import axios from 'axios';
-import type { MarketData, QuoteResponse, TokenList } from '../../../types/api';
+// src/services/api/1inch/index.ts
+import { SwapAPI } from './swapApi';
+import { PortfolioAPI } from './portfolioApi';
+import { MarketAPI } from './marketApi';
 
-const BASE_URL = 'https://api.1inch.dev/v5.0';
+export class OneInchAPI {
+  public swap: SwapAPI;
+  public portfolio: PortfolioAPI;
+  public market: MarketAPI;
 
-interface OneInchAPI {
-  getQuote: (fromToken: string, toToken: string, amount: string) => Promise<QuoteResponse>;
-  getTokenList: () => Promise<TokenList>;
-  getMarketData: (tokenAddress: string) => Promise<MarketData>;
+  constructor(apiKey: string) {
+    this.swap = new SwapAPI(apiKey);
+    this.portfolio = new PortfolioAPI(apiKey);
+    this.market = new MarketAPI(apiKey);
+  }
+
+  // Méthode pour tester la connectivité à toutes les APIs
+  async testConnection(): Promise<boolean> {
+    try {
+      // Test simple sur chaque API
+      await Promise.all([
+        this.market.getSpotPrice('0xA0b86a33E6885D0c5906C0Ae01fAec12E7e9B85E'), // USDC
+        this.market.getGasPrice(),
+      ]);
+      
+      console.log('✅ Connexion aux APIs 1inch réussie');
+      return true;
+    } catch (error) {
+      console.error('❌ Erreur de connexion aux APIs 1inch:', error);
+      return false;
+    }
+  }
 }
 
-export const createOneInchAPI = (apiKey: string): OneInchAPI => {
-  const client = axios.create({
-    baseURL: BASE_URL,
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Accept': 'application/json',
-    }
-  });
+// Configuration par défaut pour l'export
+export const createOneInchAPI = (apiKey: string) => new OneInchAPI(apiKey);
 
-  return {
-    async getQuote(fromToken: string, toToken: string, amount: string) {
-      try {
-        const response = await client.get('/quote', {
-          params: {
-            fromTokenAddress: fromToken,
-            toTokenAddress: toToken,
-            amount
-          }
-        });
-        return response.data;
-      } catch (error) {
-        console.error('1inch API error:', error);
-        throw error;
-      }
-    },
-
-    async getTokenList() {
-      try {
-        const response = await client.get('/tokens');
-        return response.data;
-      } catch (error) {
-        console.error('1inch API error:', error);
-        throw error;
-      }
-    },
-
-    async getMarketData(tokenAddress: string): Promise<MarketData> {
-      // Simulated market data for demo
-      return {
-        price: Math.random() * 2000,
-        volume24h: Math.random() * 1000000,
-        change24h: (Math.random() - 0.5) * 10,
-        high24h: Math.random() * 2500,
-        low24h: Math.random() * 1500,
-        marketCap: Math.random() * 1000000000
-      };
-    }
-  };
-};
+// Export all API classes
+export { SwapAPI } from './swapApi';
+export { PortfolioAPI } from './portfolioApi';
+export { MarketAPI } from './marketApi';
