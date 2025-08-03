@@ -35,14 +35,11 @@ const Navbar: React.FC<NavbarProps> = ({ walletAddress, onConnectWallet }) => {
             </div>
             <div className="hidden md:flex space-x-4">
               <Link to="/" className="text-slate-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">
-                Portfolio
+                Dashboard
               </Link>
-              <Link to="/trading" className="text-slate-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">
-                Trading
+              <Link to="/community" className="text-slate-300 hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium">
+                Community
               </Link>
-              <span className="text-green-400 px-3 py-2 rounded-md text-sm font-medium">
-                DeFi PulseX Pro
-              </span>
             </div>
           </div>
 

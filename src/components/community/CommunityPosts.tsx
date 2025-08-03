@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { ThumbsUp, MessageSquare, Share2, Award } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Share2, Award, Trophy, Flame, TrendingUp } from 'lucide-react';
+
+interface RankCard {
+  id: string;
+  address: string;
+  rank: number;
+  xp: number;
+  trades: number;
+  profit: string;
+  profitPercentage: string;
+}
 
 interface Post {
   id: string;
@@ -14,6 +24,36 @@ interface Post {
 
 const CommunityPosts: React.FC = () => {
   // Mock data - In production, this would come from your backend
+  const [topRankers] = useState<RankCard[]>([
+    {
+      id: '1',
+      address: '0x742d...8c8c',
+      rank: 1,
+      xp: 15000,
+      trades: 342,
+      profit: '125.5 ETH',
+      profitPercentage: '+285%'
+    },
+    {
+      id: '2',
+      address: '0x123d...45ab',
+      rank: 2,
+      xp: 12800,
+      trades: 256,
+      profit: '98.2 ETH',
+      profitPercentage: '+195%'
+    },
+    {
+      id: '3',
+      address: '0x456e...89cd',
+      rank: 3,
+      xp: 10500,
+      trades: 198,
+      profit: '76.8 ETH',
+      profitPercentage: '+156%'
+    }
+  ]);
+
   const [posts, setPosts] = useState<Post[]>([
     {
       id: '1',
@@ -62,6 +102,51 @@ const CommunityPosts: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Top Rankers Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {topRankers.map((ranker, index) => (
+          <div key={ranker.id} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 transition-all hover:bg-slate-800/70">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-xl bg-slate-700/50 border border-slate-600/50 flex items-center justify-center">
+                    <span className="text-slate-300 font-medium">{ranker.address.slice(0, 2)}</span>
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                    {index === 0 && <Trophy className="w-4 h-4 text-white" />}
+                    {index === 1 && <Flame className="w-4 h-4 text-white" />}
+                    {index === 2 && <TrendingUp className="w-4 h-4 text-white" />}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-slate-200 font-medium">{ranker.address}</div>
+                  <div className="text-sm text-green-400">Rank #{ranker.rank}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <div className="text-xs text-slate-400">Total XP</div>
+                <div className="text-lg font-medium text-slate-200">{ranker.xp.toLocaleString()}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-slate-400">Total Trades</div>
+                <div className="text-lg font-medium text-slate-200">{ranker.trades}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-slate-400">Total Profit</div>
+                <div className="text-lg font-medium text-green-400">{ranker.profit}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-xs text-slate-400">ROI</div>
+                <div className="text-lg font-medium text-green-400">{ranker.profitPercentage}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Create Post Section */}
       <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
         <textarea
